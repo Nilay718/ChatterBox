@@ -58,14 +58,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Global rate limiter
 app.use('/api', apiLimiter);
 
-// ==================== API Routes ====================
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/chats', chatRoutes);
-app.use('/api/messages', messageRoutes);
-
 // ==================== Health Check ====================
-// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -75,9 +68,16 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ==================== API Routes ====================
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/chats', chatRoutes);
+app.use('/api/messages', messageRoutes);
+
 // ==================== Serve Frontend in Production ====================
-if (process.env.NODE_ENV === 'production') {
-  const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
+import fs from 'fs';
+const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
+if (process.env.NODE_ENV === 'production' && fs.existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath));
 
   // SPA fallback — serve index.html for any non-API route
