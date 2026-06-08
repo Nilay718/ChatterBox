@@ -2,6 +2,10 @@
 
 A real-time chat application built with the MERN stack and Socket.io.
 
+🔗 **Live Demo:** [chatterbox-3ao8.onrender.com](https://chatterbox-3ao8.onrender.com)
+
+> **Note:** The app is hosted on Render's free tier, so the first load may take ~30 seconds if the server is waking up.
+
 ---
 
 ## Features
