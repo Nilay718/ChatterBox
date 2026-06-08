@@ -107,12 +107,20 @@ const sendMessage = async (req, res, next) => {
       const cloudinaryReady = !!(CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET);
 
       if (cloudinaryReady) {
-        // Production: upload to Cloudinary, then delete local file
-        const fileBuffer = (await import('fs')).readFileSync(req.file.path);
-        const result = await uploadToCloudinary(fileBuffer, 'chatterbox/messages');
+        // Upload to Cloudinary, then delete local temp file
+        const fs = await import('fs');
+        const fileBuffer = fs.readFileSync(req.file.path);
+        
+        // Use 'raw' for non-image/video files (PDFs, docs, etc.)
+        const isImage = req.file.mimetype.startsWith('image/');
+        const isVideo = req.file.mimetype.startsWith('video/');
+        const resourceType = isImage ? 'image' : isVideo ? 'video' : 'raw';
+        
+        const result = await uploadToCloudinary(fileBuffer, 'chatterbox/messages', resourceType);
         messageData.fileUrl = result.url;
-        // Clean up local temp file
-        deleteUploadedFile(getFileUrl(req.file, 'messages'));
+        
+        // Clean up local temp file using actual path
+        try { fs.unlinkSync(req.file.path); } catch {}
       } else {
         // Local dev: use the disk file path as URL
         messageData.fileUrl = getFileUrl(req.file, 'messages');
@@ -251,11 +259,18 @@ const uploadFile = async (req, res, next) => {
     let url, publicId;
 
     if (cloudinaryReady) {
-      const fileBuffer = (await import('fs')).readFileSync(req.file.path);
-      const result = await uploadToCloudinary(fileBuffer, 'chatterbox/messages');
+      const fs = await import('fs');
+      const fileBuffer = fs.readFileSync(req.file.path);
+      
+      // Use 'raw' for non-image/video files (PDFs, docs, etc.)
+      const isImage = req.file.mimetype.startsWith('image/');
+      const isVideo = req.file.mimetype.startsWith('video/');
+      const resourceType = isImage ? 'image' : isVideo ? 'video' : 'raw';
+      
+      const result = await uploadToCloudinary(fileBuffer, 'chatterbox/messages', resourceType);
       url = result.url;
       publicId = result.publicId;
-      deleteUploadedFile(getFileUrl(req.file, 'messages'));
+      try { fs.unlinkSync(req.file.path); } catch {}
     } else {
       // Local: serve from disk
       url = getFileUrl(req.file, 'messages');
