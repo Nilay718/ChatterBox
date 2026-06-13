@@ -2,18 +2,12 @@ import winston from 'winston';
 
 const { combine, timestamp, printf, colorize, errors } = winston.format;
 
-/**
- * Custom log format: [TIMESTAMP] LEVEL: message
- */
+// Log format: [TIMESTAMP] LEVEL: message
 const logFormat = printf(({ level, message, timestamp, stack }) => {
   return `[${timestamp}] ${level}: ${stack || message}`;
 });
 
-/**
- * Winston logger instance.
- * - Console transport with colors in development
- * - File transport for errors in production
- */
+// Logger setup — console in dev, files in prod
 const logger = winston.createLogger({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
   format: combine(

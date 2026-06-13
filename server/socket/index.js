@@ -10,11 +10,7 @@ import { registerPresenceHandlers } from './presenceHandler.js';
 // Using a Set of socket IDs allows the same user to connect from multiple devices
 const onlineUsers = new Map();
 
-/**
- * Initialize Socket.io server with authentication and event handlers.
- * @param {import('http').Server} httpServer
- * @returns {Server} Socket.io server instance
- */
+// Initialize Socket.io with auth and event handlers
 const initializeSocket = (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
@@ -34,7 +30,7 @@ const initializeSocket = (httpServer) => {
     },
   });
 
-  // ==================== Authentication Middleware ====================
+  // Auth middleware — verify JWT before allowing connection
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth?.token;
@@ -68,7 +64,7 @@ const initializeSocket = (httpServer) => {
     }
   });
 
-  // ==================== Connection Handler ====================
+  // On new connection
   io.on('connection', (socket) => {
     const userId = socket.userId;
     logger.info(`Socket connected: ${userId} (${socket.id})`);
@@ -96,7 +92,7 @@ const initializeSocket = (httpServer) => {
     registerMessageHandlers(io, socket, onlineUsers);
     registerPresenceHandlers(io, socket, onlineUsers);
 
-    // ==================== Disconnect Handler ====================
+    // On disconnect
     socket.on('disconnect', async (reason) => {
       logger.info(`Socket disconnected: ${userId} (${socket.id}) — ${reason}`);
 
@@ -122,9 +118,7 @@ const initializeSocket = (httpServer) => {
   return io;
 };
 
-/**
- * Mark user as online and broadcast to all connected users.
- */
+// Mark user as online and broadcast
 async function handleUserOnline(io, socket, userId) {
   try {
     await User.findByIdAndUpdate(userId, { isOnline: true });
@@ -139,9 +133,7 @@ async function handleUserOnline(io, socket, userId) {
   }
 }
 
-/**
- * Mark user as offline with lastSeen timestamp and broadcast.
- */
+// Mark user as offline with lastSeen
 async function handleUserOffline(io, userId) {
   try {
     const lastSeen = new Date();

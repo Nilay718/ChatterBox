@@ -1,14 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
 
-/**
- * Infinite scroll hook using IntersectionObserver.
- * Calls `loadMore` when the sentinel element becomes visible.
- *
- * @param {Function} loadMore - Function to call when more data is needed
- * @param {boolean} hasMore - Whether there is more data to load
- * @param {boolean} isLoading - Whether data is currently loading
- * @returns {Function} sentinelRef — attach this to the "load more" trigger element
- */
+// Calls loadMore when the sentinel element scrolls into view
 export const useInfiniteScroll = (loadMore, hasMore, isLoading) => {
   const observer = useRef(null);
 

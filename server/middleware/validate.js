@@ -17,7 +17,7 @@ const validate = (req, res, next) => {
   next();
 };
 
-// ==================== Auth Validators ====================
+// Auth Validators
 
 const registerRules = [
   body('name')
@@ -53,7 +53,7 @@ const loginRules = [
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
-// ==================== Chat Validators ====================
+// Chat Validators
 
 const createChatRules = [
   body('userId')
@@ -78,7 +78,7 @@ const createGroupRules = [
     .withMessage('Each participant must be a valid user ID'),
 ];
 
-// ==================== Message Validators ====================
+// Message Validators
 
 const sendMessageRules = [
   body('chatId')
@@ -107,7 +107,7 @@ const editMessageRules = [
     .withMessage('Message too long (max 5000 characters)'),
 ];
 
-// ==================== Query Validators ====================
+// Query Validators
 
 const searchRules = [
   query('q')

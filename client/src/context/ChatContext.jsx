@@ -36,7 +36,7 @@ export const ChatProvider = ({ children }) => {
   const selectedChatRef = useRef(selectedChat);
   selectedChatRef.current = selectedChat;
 
-  // ==================== Fetch Chats ====================
+  // Fetch Chats
   const fetchChats = useCallback(async () => {
     if (!user) return;
     setLoadingChats(true);
@@ -55,7 +55,7 @@ export const ChatProvider = ({ children }) => {
     if (user) fetchChats();
   }, [user, fetchChats]);
 
-  // ==================== Fetch Messages ====================
+  // Fetch Messages
   const fetchMessages = useCallback(
     async (chatId, page = 1) => {
       if (!chatId) return;
@@ -89,7 +89,7 @@ export const ChatProvider = ({ children }) => {
     fetchMessages(selectedChat._id, pagination.page + 1);
   }, [selectedChat, pagination, loadingMessages, fetchMessages]);
 
-  // ==================== Send Message ====================
+  // Send Message
   const sendMessage = useCallback(
     async (chatId, content, messageType = 'text', file = null, replyTo = null) => {
       try {
@@ -148,7 +148,7 @@ export const ChatProvider = ({ children }) => {
     [socket]
   );
 
-  // ==================== Edit Message ====================
+  // Edit Message
   const editMessage = useCallback(
     async (messageId, content) => {
       try {
@@ -177,7 +177,7 @@ export const ChatProvider = ({ children }) => {
     [socket, selectedChat]
   );
 
-  // ==================== Delete Message ====================
+  // Delete Message
   const deleteMessage = useCallback(
     async (messageId) => {
       try {
@@ -205,7 +205,7 @@ export const ChatProvider = ({ children }) => {
     [socket, selectedChat]
   );
 
-  // ==================== Mark Read ====================
+  // Mark Read
   const markAsRead = useCallback(
     (chatId) => {
       if (!socket || !chatId) return;
@@ -235,7 +235,7 @@ export const ChatProvider = ({ children }) => {
     [socket, user]
   );
 
-  // ==================== Socket Event Listeners ====================
+  // Socket Event Listeners
   useEffect(() => {
     if (!socket) return;
 
@@ -455,7 +455,7 @@ export const ChatProvider = ({ children }) => {
     };
   }, [socket, user, fetchChats]);
 
-  // ==================== Select Chat ====================
+  // Select Chat
   const selectChat = useCallback(
     (chat) => {
       // Leave previous chat room
@@ -479,7 +479,7 @@ export const ChatProvider = ({ children }) => {
     [selectedChat, socket, fetchMessages, markAsRead]
   );
 
-  // ==================== Create Chat ====================
+  // Create Chat
   const accessOrCreateChat = useCallback(
     async (userId) => {
       try {
@@ -503,7 +503,7 @@ export const ChatProvider = ({ children }) => {
     [selectChat]
   );
 
-  // ==================== Create Group ====================
+  // Create Group
   const createGroup = useCallback(
     async (name, participantIds) => {
       try {
@@ -525,7 +525,7 @@ export const ChatProvider = ({ children }) => {
     [selectChat]
   );
 
-  // ==================== Toggle Reaction ====================
+  // Toggle Reaction
   const toggleReaction = useCallback(
     async (messageId, emoji) => {
       try {

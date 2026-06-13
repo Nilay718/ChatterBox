@@ -5,11 +5,6 @@ import { logger } from '../utils/logger.js';
 
 // Track recently sent message IDs to prevent duplicates
 const recentMessages = new Map();
-
-/**
- * Clean up old entries from the deduplication cache.
- * Runs every 5 minutes.
- */
 setInterval(() => {
   const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
   for (const [key, timestamp] of recentMessages) {
@@ -18,19 +13,8 @@ setInterval(() => {
     }
   }
 }, 5 * 60 * 1000);
-
-/**
- * Register message-related socket event handlers.
- * Handles: sending messages, read receipts, edit/delete.
- */
 const registerMessageHandlers = (io, socket, onlineUsers) => {
   const userId = socket.userId;
-
-  /**
-   * Handle real-time message sending.
-   * This is the socket event complement to the REST API POST /api/messages.
-   * The REST API handles persistence; this handles real-time delivery.
-   */
   socket.on('send_message', async (messageData) => {
     try {
       const { message, chatId } = messageData;
@@ -91,11 +75,6 @@ const registerMessageHandlers = (io, socket, onlineUsers) => {
       });
     }
   });
-
-  /**
-   * Handle read receipts.
-   * When a user reads messages in a chat, update readBy for all unread messages.
-   */
   socket.on('mark_read', async ({ chatId, messageIds }) => {
     try {
       if (!chatId) return;
@@ -148,10 +127,6 @@ const registerMessageHandlers = (io, socket, onlineUsers) => {
       logger.error(`Error in mark_read: ${error.message}`);
     }
   });
-
-  /**
-   * Handle message edit via socket (for real-time UI update).
-   */
   socket.on('message_edited', async ({ chatId, messageId, content }) => {
     try {
       if (!chatId || !messageId) return;
@@ -167,10 +142,6 @@ const registerMessageHandlers = (io, socket, onlineUsers) => {
       logger.error(`Error in message_edited: ${error.message}`);
     }
   });
-
-  /**
-   * Handle message deletion via socket (for real-time UI update).
-   */
   socket.on('message_deleted', async ({ chatId, messageId }) => {
     try {
       if (!chatId || !messageId) return;
@@ -185,10 +156,6 @@ const registerMessageHandlers = (io, socket, onlineUsers) => {
       logger.error(`Error in message_deleted: ${error.message}`);
     }
   });
-
-  /**
-   * Handle reaction toggle via socket (for real-time UI update).
-   */
   socket.on('message_reaction', async ({ chatId, messageId, reactions }) => {
     try {
       if (!chatId || !messageId) return;

@@ -4,11 +4,6 @@ import Notification from '../models/Notification.js';
 import ApiError from '../utils/apiError.js';
 import { uploadToCloudinary } from '../config/cloudinary.js';
 import { getFileUrl, deleteUploadedFile } from '../config/upload.js';
-
-/**
- * Get paginated messages for a chat.
- * GET /api/messages/:chatId?page=1&limit=50
- */
 const getMessages = async (req, res, next) => {
   try {
     const { chatId } = req.params;
@@ -61,11 +56,6 @@ const getMessages = async (req, res, next) => {
     next(error);
   }
 };
-
-/**
- * Send a new message.
- * POST /api/messages
- */
 const sendMessage = async (req, res, next) => {
   try {
     const { chatId, content, messageType = 'text', replyTo } = req.body;
@@ -177,11 +167,6 @@ const sendMessage = async (req, res, next) => {
     next(error);
   }
 };
-
-/**
- * Edit a message (only by the sender, within a reasonable time).
- * PUT /api/messages/:id
- */
 const editMessage = async (req, res, next) => {
   try {
     const { content } = req.body;
@@ -211,11 +196,6 @@ const editMessage = async (req, res, next) => {
     next(error);
   }
 };
-
-/**
- * Soft-delete a message (only by the sender).
- * DELETE /api/messages/:id
- */
 const deleteMessage = async (req, res, next) => {
   try {
     const message = await Message.findById(req.params.id);
@@ -241,11 +221,6 @@ const deleteMessage = async (req, res, next) => {
     next(error);
   }
 };
-
-/**
- * Upload a file for a message.
- * POST /api/messages/upload
- */
 const uploadFile = async (req, res, next) => {
   try {
     if (!req.file) {
@@ -291,11 +266,6 @@ const uploadFile = async (req, res, next) => {
     next(error);
   }
 };
-
-/**
- * Search messages within a chat.
- * GET /api/messages/search/:chatId?q=<query>
- */
 const searchMessages = async (req, res, next) => {
   try {
     const { chatId } = req.params;
@@ -333,12 +303,6 @@ const searchMessages = async (req, res, next) => {
     next(error);
   }
 };
-
-/**
- * Toggle a reaction on a message.
- * POST /api/messages/:id/react
- * Body: { emoji: "👍" }
- */
 const toggleReaction = async (req, res, next) => {
   try {
     const { emoji } = req.body;

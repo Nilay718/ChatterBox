@@ -14,7 +14,7 @@ const api = axios.create({
   timeout: 15000,
 });
 
-// ==================== Request Interceptor ====================
+// Request Interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
@@ -26,7 +26,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ==================== Response Interceptor ====================
+// Response Interceptor
 let isRefreshing = false;
 let failedQueue = [];
 

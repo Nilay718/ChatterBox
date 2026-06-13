@@ -19,14 +19,14 @@ import userRoutes from './routes/userRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 
-// ==================== Validate Environment ====================
+// Validate env vars before starting
 validateEnv();
 
-// ==================== Express App Setup ====================
+// App setup
 const app = express();
 const httpServer = createServer(app);
 
-// ==================== Global Middleware ====================
+// Middleware
 
 // Security headers
 app.use(helmet({
@@ -58,7 +58,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Global rate limiter
 app.use('/api', apiLimiter);
 
-// ==================== Health Check ====================
+// Health check
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -68,13 +68,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ==================== API Routes ====================
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/messages', messageRoutes);
 
-// ==================== Serve Frontend in Production ====================
+// Serve frontend in production
 import fs from 'fs';
 const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
 if (process.env.NODE_ENV === 'production' && fs.existsSync(clientDistPath)) {
@@ -86,17 +86,17 @@ if (process.env.NODE_ENV === 'production' && fs.existsSync(clientDistPath)) {
   });
 }
 
-// ==================== Error Handling ====================
+// Error handling
 app.use(notFound);
 app.use(errorHandler);
 
-// ==================== Initialize Socket.io ====================
+// Socket.io
 const io = initializeSocket(httpServer);
 
 // Make io accessible to routes/controllers if needed
 app.set('io', io);
 
-// ==================== Start Server ====================
+// Start server
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -109,16 +109,7 @@ const startServer = async () => {
 
     // Start listening
     httpServer.listen(PORT, () => {
-      logger.info(`
-╔══════════════════════════════════════════════╗
-║         ChatterBox Server Started            ║
-╠══════════════════════════════════════════════╣
-║  Port:        ${PORT}                            ║
-║  Environment: ${(process.env.NODE_ENV || 'development').padEnd(30)}║
-║  API:         http://localhost:${PORT}/api       ║
-║  Socket.io:   ws://localhost:${PORT}             ║
-╚══════════════════════════════════════════════╝
-      `);
+      logger.info(`Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
     });
   } catch (error) {
     logger.error(`Failed to start server: ${error.message}`);

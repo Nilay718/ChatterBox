@@ -1,10 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { logger } from '../utils/logger.js';
 
-/**
- * Configure Cloudinary SDK for file/image uploads.
- * Falls back gracefully if credentials are missing (dev mode).
- */
+// Configure Cloudinary (skip if no credentials)
 const configureCloudinary = () => {
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
     process.env;
@@ -26,13 +23,7 @@ const configureCloudinary = () => {
   return true;
 };
 
-/**
- * Upload a file buffer to Cloudinary.
- * @param {Buffer} fileBuffer - The file buffer to upload
- * @param {string} folder - Cloudinary folder name
- * @param {string} resourceType - 'image', 'video', 'raw', or 'auto'
- * @returns {Promise<{url: string, publicId: string}>}
- */
+// Upload file buffer to Cloudinary
 const uploadToCloudinary = (fileBuffer, folder = 'chatterbox', resourceType = 'auto') => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -59,10 +50,7 @@ const uploadToCloudinary = (fileBuffer, folder = 'chatterbox', resourceType = 'a
   });
 };
 
-/**
- * Delete a file from Cloudinary by public ID.
- * @param {string} publicId
- */
+// Delete file from Cloudinary
 const deleteFromCloudinary = async (publicId) => {
   try {
     await cloudinary.uploader.destroy(publicId);

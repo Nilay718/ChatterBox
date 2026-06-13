@@ -70,11 +70,7 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-/**
- * Compare a candidate password with the stored hash.
- * @param {string} candidatePassword
- * @returns {Promise<boolean>}
- */
+// Compare password with stored hash
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };

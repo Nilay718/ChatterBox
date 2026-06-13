@@ -1,14 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-/**
- * Debounce hook — delays calling a function until a specified
- * amount of time has passed since the last invocation.
- * Commonly used for search input and typing indicators.
- *
- * @param {*} value - The value to debounce
- * @param {number} delay - Delay in milliseconds
- * @returns {*} The debounced value
- */
+// Debounce a value — useful for search inputs
 export const useDebounce = (value, delay = 500) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -23,14 +15,7 @@ export const useDebounce = (value, delay = 500) => {
   return debouncedValue;
 };
 
-/**
- * Debounced callback hook — returns a function that will only
- * execute after the specified delay from the last call.
- *
- * @param {Function} callback
- * @param {number} delay
- * @returns {Function}
- */
+// Returns a debounced version of the given callback
 export const useDebouncedCallback = (callback, delay = 500) => {
   const timeoutRef = useRef(null);
 

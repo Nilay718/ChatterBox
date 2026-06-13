@@ -46,7 +46,7 @@ export const SocketProvider = ({ children }) => {
       timeout: 20000,
     });
 
-    // ==================== Connection Events ====================
+    // Connection Events
     newSocket.on('connect', () => {
       setIsConnected(true);
       // Join personal room
@@ -91,7 +91,7 @@ export const SocketProvider = ({ children }) => {
       });
     });
 
-    // ==================== Presence Events ====================
+    // Presence Events
     newSocket.on('user_online', ({ userId: onlineUserId }) => {
       setOnlineUsers((prev) => new Set([...prev, onlineUserId]));
     });

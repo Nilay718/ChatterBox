@@ -1,17 +1,7 @@
 import Chat from '../models/Chat.js';
 import { logger } from '../utils/logger.js';
-
-/**
- * Register chat-related socket event handlers.
- * Handles: joining chat rooms, leaving rooms, group updates.
- */
 const registerChatHandlers = (io, socket, onlineUsers) => {
   const userId = socket.userId;
-
-  /**
-   * Join a chat room to receive real-time messages.
-   * Client emits this when opening a chat.
-   */
   socket.on('join_chat', async (chatId) => {
     try {
       if (!chatId) return;
@@ -37,19 +27,11 @@ const registerChatHandlers = (io, socket, onlineUsers) => {
       logger.error(`Error joining chat: ${error.message}`);
     }
   });
-
-  /**
-   * Leave a chat room (when navigating away from a chat).
-   */
   socket.on('leave_chat', (chatId) => {
     if (!chatId) return;
     socket.leave(chatId);
     logger.debug(`User ${userId} left chat room: ${chatId}`);
   });
-
-  /**
-   * Notify group members of group updates (name change, avatar, etc.).
-   */
   socket.on('group_updated', async ({ chatId, updates }) => {
     try {
       if (!chatId) return;
@@ -64,10 +46,6 @@ const registerChatHandlers = (io, socket, onlineUsers) => {
       logger.error(`Error broadcasting group update: ${error.message}`);
     }
   });
-
-  /**
-   * Notify when a member is added to a group.
-   */
   socket.on('member_added', async ({ chatId, addedUser }) => {
     try {
       // Notify the added user directly via their personal room
@@ -84,10 +62,6 @@ const registerChatHandlers = (io, socket, onlineUsers) => {
       logger.error(`Error notifying member added: ${error.message}`);
     }
   });
-
-  /**
-   * Notify when a member is removed from a group.
-   */
   socket.on('member_removed', async ({ chatId, removedUserId }) => {
     try {
       // Notify the removed user
