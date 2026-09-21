@@ -2,9 +2,13 @@
 
 A real-time chat application built with the MERN stack and Socket.io.
 
-🔗 **Live Demo:** [chatterbox-3ao8.onrender.com](https://chatterbox-3ao8.onrender.com)
+🔗 **GitHub:** [github.com/Nilay718/ChatterBox](https://github.com/Nilay718/ChatterBox)
 
-> **Note:** The app is hosted on Render's free tier, so the first load may take ~30 seconds if the server is waking up.
+🔗 **Live Demo (frontend):** [chatterbox-3ao8.onrender.com](https://chatterbox-3ao8.onrender.com)
+
+📄 **Internship Task 5 write-up:** [docs/TASK-5-SUBMISSION.md](docs/TASK-5-SUBMISSION.md)
+
+The frontend is hosted at the live demo URL above. The Express API and Socket.io server run as a **separate** Render web service. The production frontend build uses `VITE_API_URL` and `VITE_SOCKET_URL` for that API/socket host. Render’s free-tier instances may have an initial wake-up delay (~30 seconds).
 
 ---
 
@@ -12,7 +16,7 @@ A real-time chat application built with the MERN stack and Socket.io.
 
 - User signup, login, logout (JWT authentication)
 - One-to-one real-time chat
-- Group chat (create, join, leave)
+- Group chat (create groups, add members, and leave groups)
 - Online/offline status
 - Typing indicators
 - Read receipts (blue checkmarks)
@@ -37,7 +41,7 @@ A real-time chat application built with the MERN stack and Socket.io.
 | Database | MongoDB (Mongoose) |
 | Real-time | Socket.io |
 | Auth | JWT (access + refresh tokens) |
-| File Storage | Cloudinary |
+| File Storage | Cloudinary in production; local disk fallback when Cloudinary env vars are unset |
 
 ---
 
@@ -47,6 +51,8 @@ A real-time chat application built with the MERN stack and Socket.io.
 chatterbox/
 ├── .gitignore
 ├── README.md
+├── docs/
+│   └── TASK-5-SUBMISSION.md    # Happieloop Task 5 documentation
 │
 ├── server/                     # Backend
 │   ├── .env.example
@@ -91,7 +97,7 @@ chatterbox/
 
 - [Node.js](https://nodejs.org/) v18 or higher
 - [MongoDB Atlas](https://www.mongodb.com/atlas) account (free tier works)
-- [Cloudinary](https://cloudinary.com/) account (free tier works)
+- [Cloudinary](https://cloudinary.com/) — used for **production** image/file hosting. Not required just to run locally; if Cloudinary variables are unset, uploads fall back to disk under `server/uploads`.
 
 ### 1. Install Dependencies
 
