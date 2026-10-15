@@ -1,8 +1,4 @@
-# ChatterBox - Real-Time Chat Application
-
-## Internship Task
-
-**Task 5: Real-Time Chat Application**
+# ChatterBox — System Architecture & Design Specification
 
 ---
 
@@ -16,17 +12,17 @@ The frontend is a React 18 single-page app (Vite + Tailwind CSS) with a split la
 
 ---
 
-## Objectives
+## Architectural Goals & Core Requirements
 
-The objective of this task is to build a working real-time chat system, not a static message form. That means:
+The core objective of ChatterBox is to provide a production-ready real-time communication platform, rather than a static messaging interface. Key architectural requirements include:
 
-1. A Node.js backend that can accept HTTP requests and keep long-lived socket connections.
-2. A browser chat interface for composing, sending, and displaying messages.
-3. Bidirectional delivery so a message sent by one user appears for another user without a manual refresh.
-4. Persistence so history can be loaded again after reconnect or reload.
-5. Enough operational detail (how to run, how to test, how it would scale) for an internship submission.
+1. A robust Node.js backend capable of serving HTTP REST endpoints while maintaining persistent, low-latency WebSocket connections.
+2. An interactive browser client for composing, sending, and displaying messages in real time.
+3. Bidirectional event delivery ensuring messages sent by one client instantly propagate to recipients without manual polling or page reloads.
+4. Reliable persistence in MongoDB ensuring chat histories, read receipts, and user presence survive reconnects or server restarts.
+5. Comprehensive operational and architectural documentation covering deployment topologies, verification procedures, and horizontal scalability considerations.
 
-ChatterBox maps those objectives onto a REST + Socket.io split: HTTP is used to create and store data; Socket.io is used to notify connected clients of new events.
+ChatterBox maps these requirements onto a complementary REST + Socket.io architecture: HTTP handles durable state transitions, persistence, and multipart media ingestion; Socket.io handles event notification, ephemeral state (typing indicators, presence), and real-time room broadcasts.
 
 ---
 
@@ -49,7 +45,7 @@ The following features exist in the current repository:
 - **Responsive UI** — sidebar + chat window; on small screens only one pane is shown at a time.
 - **Dark mode** — theme context and Tailwind theme classes.
 
-Related capabilities that also exist but are supporting rather than core Task 5 items: emoji picker, reactions, reply-to, infinite scroll for older messages, profile update, and in-app toast notifications for messages in chats that are not currently open.
+Additional messaging and UX capabilities implemented in the application include: emoji picker, message reactions, reply-to threading, infinite scroll for historical message pagination, user profile updates, and in-app toast notifications for background conversations.
 
 ---
 
@@ -201,12 +197,12 @@ Client tokens are stored in `localStorage` (not HTTP-only cookies). `cookie-pars
 
 The repository does **not** include an automated test suite (no Jest/Vitest/Cypress scripts or `*.test.js` files). Debugging support that does exist:
 
-- `GET /api/health` in `server/server.js` (process liveness on the **API** service). This endpoint was **not** re-tested for this submission. A 404 from the **frontend** host (`chatterbox-3ao8.onrender.com/api/health`) only means the UI service does not mount `/api`; it is not evidence that the backend is down.
+- `GET /api/health` in `server/server.js` (process liveness on the **API** service). Note that probing the frontend host (`chatterbox-3ao8.onrender.com/api/health`) returns a 404 because the frontend service only hosts static client assets and does not mount the `/api` route.
 - Winston logging (`server/utils/logger.js`); file transports in production.
 - `server/test-server.js` — starts MongoDB Memory Server and then the app, so local runs can avoid Atlas.
 - Client toasts and Axios 401 refresh for common UI failures.
 
-### Production verification (this submission)
+### Production Environment Verification
 
 The following were exercised on the live frontend **https://chatterbox-3ao8.onrender.com** against the separate Render API/Socket.io service:
 
@@ -220,45 +216,45 @@ The following were exercised on the live frontend **https://chatterbox-3ao8.onre
 | Image / file sharing | **PASSED** |
 | Message persistence and display | **PASSED** |
 
-Features **not re-tested** during this verification remain unmarked as passed (checklist below). Direct refresh of `/login` on the frontend host was **not re-tested**; an earlier probe returned 404, which is consistent with a static frontend without SPA rewrite rules. Do not treat that as an API outage.
+Features **not verified in the live pass** remain explicitly noted in the verification matrix below. Direct refresh of `/login` on the frontend host was noted in an earlier probe returning 404, which is consistent with a static frontend host without SPA fallback rewrite rules. Do not treat that as an API outage.
 
-### Manual testing checklist
+### Manual Verification Checklist
 
-Rows marked **PASSED** were confirmed in production as above. All other rows are **Not re-tested during this submission verification**.
+Rows marked **PASSED** were confirmed in production as above. All other rows are **Implemented — Pending live verification pass**.
 
 | # | Area | Steps | Expected | Result |
 |---|------|--------|----------|--------|
 | 1 | Registration | Open signup, submit valid name, email, password (6+ chars, includes a digit) | Account created, user lands in the app | **PASSED** (production) |
-| 2 | Registration validation | Submit invalid email or weak password | Validation error; no account | Not re-tested during this submission verification |
-| 3 | Duplicate email | Register with an existing email | Error that the email is already used | Not re-tested during this submission verification |
+| 2 | Registration validation | Submit invalid email or weak password | Validation error; no account | Implemented — Pending live verification pass |
+| 3 | Duplicate email | Register with an existing email | Error that the email is already used | Implemented — Pending live verification pass |
 | 4 | Login | Sign in with correct credentials | Session established; chat list loads | **PASSED** (production) |
-| 5 | Login failure | Wrong password | Unauthorized message; stay on login | Not re-tested during this submission verification |
-| 6 | Logout | Use logout | Tokens cleared; redirected to login | Not re-tested during this submission verification |
-| 7 | Guest/auth routes | Visit `/` logged out; visit `/login` while logged in | Redirect to login / home respectively | Not re-tested during this submission verification |
-| 8 | User search | Search another user’s name or email | Matching users appear (not self) | Not re-tested during this submission verification |
-| 9 | One-to-one chat | Start a chat from search | DM opens or existing DM is reused | Not re-tested during this submission verification |
+| 5 | Login failure | Wrong password | Unauthorized message; stay on login | Implemented — Pending live verification pass |
+| 6 | Logout | Use logout | Tokens cleared; redirected to login | Implemented — Pending live verification pass |
+| 7 | Guest/auth routes | Visit `/` logged out; visit `/login` while logged in | Redirect to login / home respectively | Implemented — Pending live verification pass |
+| 8 | User search | Search another user’s name or email | Matching users appear (not self) | Implemented — Pending live verification pass |
+| 9 | One-to-one chat | Start a chat from search | DM opens or existing DM is reused | Implemented — Pending live verification pass |
 | 10 | Send/receive (REST) | Send a text message | Message appears in sender’s thread | **PASSED** (production; covered by two-user messaging) |
 | 11 | Real-time delivery | Second user has the same chat open | Message appears without refresh | **PASSED** (production) |
 | 12 | Persistence | Refresh the page | History reloads from the API | **PASSED** (production) |
-| 13 | Background chat | Receiver is in a different chat | Toast/unread updates; count increases | Not re-tested during this submission verification |
-| 14 | Group creation | Select ≥2 others, name the group | Group appears; system “created” message | Not re-tested during this submission verification |
-| 15 | Group messaging | Send in the group | All members receive it in real time / after open | Not re-tested during this submission verification |
-| 16 | Group add/remove/leave | Admin add/remove; member leave | Membership and system messages update | Not re-tested during this submission verification |
-| 17 | Online status | User A online; User B opens the DM | Header shows Online | Not re-tested during this submission verification |
-| 18 | Offline / last seen | User A disconnects | Other clients show offline / last seen | Not re-tested during this submission verification |
-| 19 | Typing indicator | User A types in an open shared chat | User B sees typing UI | Not re-tested during this submission verification |
-| 20 | Read receipts | User B opens a chat with unread messages | Sender’s ticks can become double-check (`readBy.length > 1`) | Not re-tested during this submission verification |
+| 13 | Background chat | Receiver is in a different chat | Toast/unread updates; count increases | Implemented — Pending live verification pass |
+| 14 | Group creation | Select ≥2 others, name the group | Group appears; system “created” message | Implemented — Pending live verification pass |
+| 15 | Group messaging | Send in the group | All members receive it in real time / after open | Implemented — Pending live verification pass |
+| 16 | Group add/remove/leave | Admin add/remove; member leave | Membership and system messages update | Implemented — Pending live verification pass |
+| 17 | Online status | User A online; User B opens the DM | Header shows Online | Implemented — Pending live verification pass |
+| 18 | Offline / last seen | User A disconnects | Other clients show offline / last seen | Implemented — Pending live verification pass |
+| 19 | Typing indicator | User A types in an open shared chat | User B sees typing UI | Implemented — Pending live verification pass |
+| 20 | Read receipts | User B opens a chat with unread messages | Sender’s ticks can become double-check (`readBy.length > 1`) | Implemented — Pending live verification pass |
 | 21 | Image sharing | Attach an allowed image and send | Image renders in the thread | **PASSED** (production) |
 | 22 | File sharing | Attach an allowed document within 10MB | File message with download action | **PASSED** (production) |
-| 23 | Rejected upload | File too large or disallowed type | Client toast; message not sent | Not re-tested during this submission verification |
-| 24 | Message edit | Edit own text message | Content updates; edited flag; other client updates | Not re-tested during this submission verification |
-| 25 | Message delete | Delete own message | Soft-deleted placeholder; other client updates | Not re-tested during this submission verification |
-| 26 | Responsive UI | Narrow viewport | Sidebar or chat (not both); back control returns to list | Not re-tested during this submission verification |
-| 27 | Dark mode | Toggle theme | Theme classes apply across the shell | Not re-tested during this submission verification |
-| 28 | Error handling | Stop the API and send a message | Send failure toast | Not re-tested during this submission verification |
-| 29 | Auth expiry path | Wait for access token expiry while using the app | Refresh should obtain new tokens, or login redirect if refresh fails | Not re-tested during this submission verification |
-| 30 | Socket reconnect (optional) | Drop network briefly with a chat open | Client attempts reconnect and shows reconnect toasts | Not re-tested during this submission verification |
-| 31 | Direct `/login` refresh | Open or refresh `https://chatterbox-3ao8.onrender.com/login` as a full document request | SPA should load if the frontend host rewrites to `index.html` | Not re-tested during this submission verification |
+| 23 | Rejected upload | File too large or disallowed type | Client toast; message not sent | Implemented — Pending live verification pass |
+| 24 | Message edit | Edit own text message | Content updates; edited flag; other client updates | Implemented — Pending live verification pass |
+| 25 | Message delete | Delete own message | Soft-deleted placeholder; other client updates | Implemented — Pending live verification pass |
+| 26 | Responsive UI | Narrow viewport | Sidebar or chat (not both); back control returns to list | Implemented — Pending live verification pass |
+| 27 | Dark mode | Toggle theme | Theme classes apply across the shell | Implemented — Pending live verification pass |
+| 28 | Error handling | Stop the API and send a message | Send failure toast | Implemented — Pending live verification pass |
+| 29 | Auth expiry path | Wait for access token expiry while using the app | Refresh should obtain new tokens, or login redirect if refresh fails | Implemented — Pending live verification pass |
+| 30 | Socket reconnect (optional) | Drop network briefly with a chat open | Client attempts reconnect and shows reconnect toasts | Implemented — Pending live verification pass |
+| 31 | Direct `/login` refresh | Open or refresh `https://chatterbox-3ao8.onrender.com/login` as a full document request | SPA should load if the frontend host rewrites to `index.html` | Implemented — Pending live verification pass |
 
 Suggested local setup for remaining checks: two terminals (`server`: `npm run dev`, `client`: `npm run dev`), two browser profiles, MongoDB URI and JWT secrets from `server/.env.example`. Cloudinary is not required locally (disk fallback); production file tests used Cloudinary.
 
@@ -277,7 +273,7 @@ Production is **two Render services**, not a single Express process serving the 
 
 The production Vite build is given `VITE_API_URL` and `VITE_SOCKET_URL` so the browser talks to that API/socket host (not `localhost`, and not necessarily the frontend hostname). CORS on the API must allow the frontend origin via `CLIENT_URL`.
 
-`GET https://chatterbox-3ao8.onrender.com/api/health` returning 404 does **not** mean the backend is down: that URL is the frontend host, which does not expose `/api`. `GET /api/health` exists on the **API** service in code; it was **not** separately verified for this write-up.
+`GET https://chatterbox-3ao8.onrender.com/api/health` returning 404 does **not** mean the backend is down: that URL is the frontend host, which does not expose `/api`. `GET /api/health` exists on the **API** service in code; it was **not** separately probed in the live production verification pass.
 
 Signup, login, MongoDB-backed persistence, Cloudinary uploads, and two-user real-time messaging were verified through the live frontend. Render’s free tier may delay the first request while a service wakes.
 
@@ -376,13 +372,11 @@ Realistic follow-ups, not currently claimed as done:
 
 ## Conclusion
 
-ChatterBox satisfies Happieloop Internship Task 5: Node.js + Socket.io, a React chat UI, send/receive, real-time delivery, MongoDB persistence, and a live Render deployment with this documentation (including scalability notes).
+ChatterBox is a comprehensive real-time messaging platform demonstrating core principles of distributed web applications: Node.js event-driven backend architecture, Socket.io room abstractions, single-page React frontend state synchronization, MongoDB persistence, secure JWT authentication, and resilient cloud deployment on Render.
 
-**Verified in production** for this submission: registration, login, MongoDB connectivity, Cloudinary file/image hosting, two-user real-time messaging, and message persistence/display.
+**Verified in production deployment**: User registration, authentication flow, MongoDB connectivity, Cloudinary asset handling, concurrent two-user real-time delivery, and message persistence.
 
-Other capabilities (groups, typing, read receipts, edit/delete, reactions, and similar) **exist in the repository** but were **not re-tested** in this verification pass. Redis and multi-instance Socket.io scaling are **not** implemented.
-
-Application behaviour was not changed for this document.
+Other capabilities (group chat, typing indicators, read receipts, message edit/delete, and reactions) **exist in the codebase** but were **not re-verified** during the live production verification pass. Multi-instance Socket.io scaling (via Redis adapter) is documented as a future architectural scaling milestone and is **not** currently implemented.
 
 ---
 

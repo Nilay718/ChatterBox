@@ -6,7 +6,7 @@ A real-time chat application built with the MERN stack and Socket.io.
 
 🔗 **Live Demo (frontend):** [chatterbox-3ao8.onrender.com](https://chatterbox-3ao8.onrender.com)
 
-📄 **Internship Task 5 write-up:** [docs/TASK-5-SUBMISSION.md](docs/TASK-5-SUBMISSION.md)
+📖 **Architecture & System Design Documentation:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 The frontend is hosted at the live demo URL above. The Express API and Socket.io server run as a **separate** Render web service. The production frontend build uses `VITE_API_URL` and `VITE_SOCKET_URL` for that API/socket host. Render’s free-tier instances may have an initial wake-up delay (~30 seconds).
 
@@ -15,6 +15,7 @@ The frontend is hosted at the live demo URL above. The Express API and Socket.io
 ## Features
 
 - User signup, login, logout (JWT authentication)
+- Email OTP verification on signup (unverified users cannot log in)
 - One-to-one real-time chat
 - Group chat (create groups, add members, and leave groups)
 - Online/offline status
@@ -52,7 +53,7 @@ chatterbox/
 ├── .gitignore
 ├── README.md
 ├── docs/
-│   └── TASK-5-SUBMISSION.md    # Happieloop Task 5 documentation
+│   └── ARCHITECTURE.md         # Architecture, real-time protocols & scaling analysis
 │
 ├── server/                     # Backend
 │   ├── .env.example
@@ -127,6 +128,8 @@ CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 CLIENT_URL=http://localhost:5173
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=ChatterBox <noreply@yourdomain.com>
 ```
 
 Create a `.env` file in `client/`:
@@ -135,6 +138,8 @@ Create a `.env` file in `client/`:
 VITE_API_URL=http://localhost:5000
 VITE_SOCKET_URL=http://localhost:5000
 ```
+
+For local signup emails, add `RESEND_API_KEY` and `EMAIL_FROM` to `server/.env` (from a Resend account). Never put those values in the frontend. In production, set them on the **API** Render service only. Existing accounts without `isEmailVerified: false` keep working without a new OTP.
 
 ### 3. Run the App
 
@@ -157,8 +162,10 @@ Open http://localhost:5173 in your browser.
 ### Auth — `/api/auth`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/register` | Create account |
-| POST | `/login` | Login |
+| POST | `/register` | Create account (sends email OTP, no JWT yet) |
+| POST | `/login` | Login (unverified users get `requiresVerification`) |
+| POST | `/verify-otp` | Verify 6-digit email code, then issue tokens |
+| POST | `/resend-otp` | Resend verification code (cooldown applies) |
 | POST | `/logout` | Logout |
 | POST | `/refresh` | Refresh token |
 
